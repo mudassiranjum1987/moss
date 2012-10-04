@@ -1,0 +1,58 @@
+
+
+MOSS -- a Mini Operating System Simulator
+=========================================
+
+
+Compiling:
+
+	Use the Makefile -- on Linux, just running "make" is sufficient.
+	The main MOSS classes are left in the source directory;  module
+	classes (programs and kernel-modules) are left in the modules/
+	sub-directory, along with an auto-generated INVENTORY file.
+
+	MOSS can also be compiled and run from within BlueJ, if you
+	prefer to develop in that environment, but running from the
+	command-line is easier (imo)..
+
+
+Running:
+
+	"java MiniOSSim" will start the thing up, with the invoking TTY
+	(or Java console) being used for the MOSS console.
+
+	When MOSS starts up, it creates a bare-bones file-system at the
+	root (/), then reads the modules/INVENTORY file and copies over
+	the various classes from the host's file-system into the MOSS
+	file-system.  Files will then be found in /bin, /modules and /lib.
+
+
+Bugs:
+
+	MOSS does not attempt to be perfect, in any way.  There are
+	several things missing, some things not wholly implemented and
+	probably some just plain broken things.  Patches/etc. gratefully
+	accepted :).
+
+
+Documentation:
+
+	See the accompanying HTML documentation.  The web-page for MOSS
+	is:
+	              http://www.cs.kent.ac.uk/~frmb/moss/
+
+
+Copying:
+
+	This software is released under the terms and conditions of the
+	GNU General Public License (GPL) version 2.0 or later.  See the
+	file COPYING for details.
+	
+	Commercial licensing is available too (at a cost).
+
+
+
+Fred Barnes  <F.R.M.Barnes@kent.ac.uk>
+December 2004
+
+

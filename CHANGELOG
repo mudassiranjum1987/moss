@@ -1,0 +1,13 @@
+16/01/2005	frmb	released at version 0.2.3
+16/01/2005	frmb	skeleton support for networking
+16/01/2005	frmb	more updates (various things)
+19/12/2004	frmb	released at verison 0.2.2
+05/12/2004	frmb	released at version 0.2.1
+27/11/2004	frmb	started named message-queue implementation
+26/11/2004	frmb	packaged moss up, some BlueJ support added
+22/11/2004	frmb	released at version 0.2.0
+22/11/2004	frmb	proc-fs (MProcFS) and dev-fs (MDevFS) added
+21/11/2004	frmb	host file-system, MExec and related things added
+20/11/2004	frmb	object file-system up and running
+19/11/2004	frmb	decided to start a changelog..  start date was
+			about 01/2004, with some hacking around 03/2004

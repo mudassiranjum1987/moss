@@ -1,0 +1,57 @@
+#! /bin/bash
+
+if [ $# -lt 1 ]; then
+	printf '%s: usage error!\n' $0 1>&2
+	exit 1
+fi
+
+if [ ! -d $1 ]; then
+	printf '%s: not a directory: %s\n' $0 $1 1>&2
+	exit 1
+fi
+
+INVFILE=./INVENTORY
+
+rm -f $INVFILE
+
+printf 'building module inventory'
+
+for file in $1/*.class; do
+
+	if [ ! -f $file ]; then
+		break
+	fi
+
+	BASE=$(printf '%s' "$file" | sed -e 's:'$1'/\([^.]*\)\.class:\1:g')
+
+	case "$BASE" in
+	*\$*)
+		ENAME=$BASE
+		EDIR=/lib
+		;;
+	U*)
+		ENAME=$(printf '%s' "$BASE" | sed -e 's/^.//g' | tr '[A-Z]' '[a-z]')
+		EDIR=/bin
+		;;
+	K*)
+		ENAME=$(printf '%s' "$BASE" | sed -e 's/^.//g' | tr '[A-Z]' '[a-z]')
+		EDIR=/modules
+		;;
+	*)
+		printf '%s: bad base ?\n' $0
+		exit 1
+	esac
+
+	printf '%s %s/%s\n' $file $EDIR $ENAME >> $INVFILE 
+	printf '.'
+
+done
+
+if [ -r INVEXTRA ]; then
+	cat INVEXTRA >> $INVFILE
+	printf '-'
+fi
+
+printf '\n'
+
+
