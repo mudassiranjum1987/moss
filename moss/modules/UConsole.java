@@ -296,6 +296,7 @@ public class UConsole implements MUserProcess
 	{
 		String bits[];
 		int nbits = 0;
+		cmd = cmd.replaceAll("[\\r\\n]", "");
 		int clen = cmd.length();
 
 		if (clen == 0) {

@@ -211,6 +211,7 @@ public class MInitTask implements MUserProcess
 			j++;
 			i=j;
 
+			dpath = dpath.replaceAll("[\\r\\n]", "");
 			j = setuphostfile (spath, dpath);
 			if (j < 0) {
 				return j;
