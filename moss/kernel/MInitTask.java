@@ -211,7 +211,7 @@ public class MInitTask implements MUserProcess
 			j++;
 			i=j;
 
-			dpath = dpath.replaceAll("[\\r\\n]", "");
+			dpath = dpath.replaceAll("[\\r\\n]", "");	//Remove carriage return that has been added by <manj>
 			j = setuphostfile (spath, dpath);
 			if (j < 0) {
 				return j;
