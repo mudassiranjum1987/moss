@@ -1,0 +1,9 @@
+# the console sources this file when it starts -- stick useful stuff in here
+
+alias ls /bin/ls
+alias ll /bin/ls -l
+alias ps /bin/proclist
+alias cat /bin/cat
+alias kill /bin/kill
+alias die /bin/kill TERM
+
