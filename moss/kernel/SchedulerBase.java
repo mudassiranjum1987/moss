@@ -1,6 +1,6 @@
 package moss.kernel;
 
-public class SchedulerBase implements IScheduler {
+public abstract class SchedulerBase implements IScheduler {
 
 	//Constructor
 	
@@ -81,8 +81,6 @@ public class SchedulerBase implements IScheduler {
 		MKernel.lock.claim_write ();
 		MKernel.current[cpu] = old_p;
 		/* ensure it is properly detached from any queue */
-		old_p.next = null;
-		old_p.prev = null;
 		old_p.state = MProcess.TASK_RUNNING;
 		MKernel.lock.release_write ();
 		

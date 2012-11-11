@@ -1,5 +1,6 @@
 /*
  *	MKernel.java -- MOSS kernel / start
+
  *	Copyright (C) 2004 Fred Barnes <frmb@kent.ac.uk>
  *
  *	This program is free software; you can redistribute it and/or modify
@@ -31,8 +32,7 @@ import java.util.*;
 public class MKernel
 {
 	//{{{  private stuff -- code must hold "lock" (below) before accessing these
-	private static CREWLock lock;
-	private static MProcess run_queue;
+	public static CREWLock lock;
 	private static int nextpid;
 	//}}}
 	//{{{  public static variables that we allow other parts of the system to read
@@ -48,7 +48,17 @@ public class MKernel
 
 	/** virtual processor objects */
 	public static MProcessor processors[];
+	
+	/** Scheduler object */
+	public static IScheduler m_schedular; 
+	
 	//}}}
+	
+	public static IScheduler getScheduler()
+	{
+		return m_schedular;
+	}
+	
 
 	//{{{  private static class PFS_mkernel implements MProcFSIf
 	/**
@@ -108,12 +118,12 @@ public class MKernel
 	 */
 	public static void init_kernel (MProcessor cpus[], PrintStream msgs)
 	{
+		m_schedular = new FIFOScheduler();
 		current = new MProcess[MConfig.ncpus];
 		lock = new CREWLock ();
 		nextpid = 0;
 
 		msgs.println ("MKernel starting...");
-		run_queue = null;
 		init_task = null;
 		task_list = null;
 		processors = cpus;
@@ -187,7 +197,7 @@ public class MKernel
 		if (current[cpu] == null) {
 			panic ("MKernel::schedule().  current[cpu] is null!");
 		}
-		if (run_queue == null) {
+		if (!getScheduler().IsProcessAvailable()) {
 			/* nothing else to run, make processor idle */
 			old_p = current[cpu];
 			new_p = null;
@@ -195,14 +205,8 @@ public class MKernel
 		} else {
 			/* pick a process off the run-queue */
 			old_p = current[cpu];
-			new_p = run_queue;
-			if (run_queue.next == run_queue) {
-				run_queue = null;
-			} else {
-				run_queue = run_queue.next;
-				run_queue.prev = new_p.prev;
-				run_queue.prev.next = run_queue;
-			}
+			new_p = getScheduler().GetNextProcess();
+			
 			processors[cpu].set_process (new_p);
 		}
 		current[cpu] = null;
@@ -230,8 +234,6 @@ public class MKernel
 		lock.claim_write ();
 		current[cpu] = old_p;
 		/* ensure it is properly detached from any queue */
-		old_p.next = null;
-		old_p.prev = null;
 		old_p.state = MProcess.TASK_RUNNING;
 		lock.release_write ();
 	}
@@ -269,8 +271,6 @@ public class MKernel
 		processors[0].set_process (init_task);
 		init_task.state = MProcess.TASK_RUNNING;
 		init_task.pid = 1;
-		init_task.prev = null;
-		init_task.next = null;
 		nextpid = 2;
 		lock.release_write ();
 		init_task.start ();
@@ -331,8 +331,6 @@ public class MKernel
 		lock.claim_write ();
 		current[cpu] = p;
 		/* ensure proper detachment from any queue */
-		p.next = null;
-		p.prev = null;
 		p.state = MProcess.TASK_RUNNING;
 		lock.release_write ();
 		// System.err.println ("starting_process(" + current[cpu].getName() + ") on CPU " + cpu);
@@ -372,7 +370,7 @@ public class MKernel
 
 		lock.claim_write ();
 
-		if (run_queue == null) {
+		if (!getScheduler().IsProcessAvailable()) {
 			/* nothing else to run, make processor idle */
 			old_p = current[cpu];
 			new_p = null;
@@ -380,14 +378,8 @@ public class MKernel
 		} else {
 			/* pick a process off the run-queue */
 			old_p = current[cpu];
-			new_p = run_queue;
-			if (run_queue.next == run_queue) {
-				run_queue = null;
-			} else {
-				run_queue = run_queue.next;
-				run_queue.prev = new_p.prev;
-				run_queue.prev.next = run_queue;
-			}
+			new_p = getScheduler().GetNextProcess();
+			
 			processors[cpu].set_process (new_p);
 		}
 		current[cpu] = null;			/* just incase anything tries during the reschedule */
@@ -448,17 +440,7 @@ public class MKernel
 	{
 		p.state = MProcess.TASK_RUNNABLE;
 		lock.claim_write ();
-		if (run_queue == null) {
-			/* make it the run-queue */
-			p.next = p;
-			p.prev = p;
-			run_queue = p;
-		} else {
-			run_queue.prev.next = p;
-			p.prev = run_queue.prev;
-			p.next = run_queue;
-			run_queue.prev = p;
-		}
+		getScheduler().AddProcess(p);
 		lock.release_write ();
 	}
 	//}}}
@@ -473,7 +455,7 @@ public class MKernel
 	{
 		p.state = MProcess.TASK_RUNNABLE;
 		lock.claim_write ();
-		if (run_queue == null) {
+		if (!getScheduler().IsProcessAvailable()) {
 			int freecpu = -1;
 
 			/* see if there's a spare processor (and the process isn't already running) */
@@ -497,15 +479,10 @@ public class MKernel
 				schedule_to_cpu (p, freecpu);
 			} else {
 				/* make it the run-queue */
-				p.next = p;
-				p.prev = p;
-				run_queue = p;
+				getScheduler().AddProcess(p);
 			}
 		} else {
-			run_queue.prev.next = p;
-			p.prev = run_queue.prev;
-			p.next = run_queue;
-			run_queue.prev = p;
+			getScheduler().AddProcess(p);
 		}
 		lock.release_write ();
 	}
