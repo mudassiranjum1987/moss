@@ -31,8 +31,6 @@ import moss.user.*;
 public class MProcess extends Thread
 {
 	//{{{  variables
-	/** previous and next processes on the run-queue */
-	public MProcess prev, next;
 	/** next process on a wait queue */
 	public MProcess q_next;
 
@@ -260,8 +258,6 @@ public class MProcess extends Thread
 	 */
 	public MProcess ()
 	{
-		prev = null;
-		next = null;
 		q_next = null;
 		prev_task = null;
 		next_task = null;
@@ -290,8 +286,6 @@ public class MProcess extends Thread
 	 */
 	public MProcess (MProcess parent)
 	{
-		prev = null;
-		next = null;
 		q_next = null;
 		prev_task = null;
 		next_task = null;
@@ -421,7 +415,7 @@ public class MProcess extends Thread
 		}
 
 		/* create and initialise a new MProcess structure */
-		mp = new MProcess (parent);
+		mp = MKernel.NewProcess(parent);
 		mp.user_if = mup;
 		mp.pid = MKernel.get_free_pid ();
 		mp.cmdline = args;

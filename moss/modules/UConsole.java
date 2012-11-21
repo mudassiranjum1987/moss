@@ -296,12 +296,13 @@ public class UConsole implements MUserProcess
 	{
 		String bits[];
 		int nbits = 0;
+		cmd = cmd.replaceAll("[\\r\\n]", "");		//Remove carriage return that has been added by <manj>
 		int clen = cmd.length();
 
 		if (clen == 0) {
 			return;
 		} else {
-			int i;
+				int i;
 
 			for (i=0; (i<clen) && ((cmd.charAt(i) == ' ') || (cmd.charAt(i) == '\t')); i++);
 			if (i == clen) {
