@@ -52,6 +52,8 @@ public class MKernel
 	/** Scheduler object */
 	public static IScheduler m_schedular; 
 	
+	private static SchedulerType m_schedularType;
+	
 	//}}}
 	
 	public static IScheduler getScheduler()
@@ -118,7 +120,11 @@ public class MKernel
 	 */
 	public static void init_kernel (MProcessor cpus[], PrintStream msgs)
 	{
-		m_schedular = new FIFOScheduler();
+		//Set this value to make the specific schedular active <manj>
+		m_schedularType = SchedulerType.FIFO;
+		
+		m_schedular = NewScheduler();
+		
 		current = new MProcess[MConfig.ncpus];
 		lock = new CREWLock ();
 		nextpid = 0;
@@ -188,54 +194,7 @@ public class MKernel
 	 */
 	public static void schedule ()
 	{
-		/* we enter this with the "current" Thread */
-		MProcess old_p, new_p;
-		int cpu = MProcessor.currentCPU ();
-
-		lock.claim_write ();
-
-		if (current[cpu] == null) {
-			panic ("MKernel::schedule().  current[cpu] is null!");
-		}
-		if (!getScheduler().IsProcessAvailable()) {
-			/* nothing else to run, make processor idle */
-			old_p = current[cpu];
-			new_p = null;
-			processors[cpu].set_process (null);
-		} else {
-			/* pick a process off the run-queue */
-			old_p = current[cpu];
-			new_p = getScheduler().GetNextProcess();
-			
-			processors[cpu].set_process (new_p);
-		}
-		current[cpu] = null;
-
-		lock.release_write ();
-
-		if (new_p != old_p) {
-			/* wake new (if not idling), sleep old */
-			synchronized (old_p) {
-				if (new_p != null) {
-					synchronized (new_p) {
-						new_p.notify ();
-					}
-				}
-				try {
-					old_p.wait ();
-				} catch (InterruptedException e) {
-					panic ("MKernel::schedule().  interrupted: " + e.getMessage());
-				}
-			}
-		}
-
-		/* when a thread wakes up here, it is old_p */
-		cpu = MProcessor.currentCPU ();
-		lock.claim_write ();
-		current[cpu] = old_p;
-		/* ensure it is properly detached from any queue */
-		old_p.state = MProcess.TASK_RUNNING;
-		lock.release_write ();
+		getScheduler().Schedule();
 	}
 	//}}}
 	//{{{  private static void schedule_to_cpu (MProcess p, int cpu)
@@ -774,6 +733,33 @@ public class MKernel
 		return;
 	}
 	//}}}
+	
+	
+	public static MProcess NewProcess(MProcess parentProcess)
+	{
+		switch(m_schedularType)
+		{
+		case FIFO:
+			return new MProcess(parentProcess);
+		case Lottery:
+			return new MLotteryProcess(parentProcess);
+		}
+		
+		return null;
+	}
+	
+	private static IScheduler NewScheduler()
+	{
+		switch(m_schedularType)
+		{
+		case FIFO:
+			return new FIFOScheduler();
+		case Lottery:
+			return new LotteryScheduler();
+		}
+		
+		return null;
+	}
 }
 
 

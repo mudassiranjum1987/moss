@@ -235,7 +235,7 @@ public class MInitTask implements MUserProcess
 		 * Other (regular) processes should not start themselves either.. */
 		console = null;
 		env = new MEnv ();
-		me = new MProcess (null);
+		me = MKernel.NewProcess(null);
 
 		me.pid = 1;
 		me.state = MProcess.TASK_INVALID;

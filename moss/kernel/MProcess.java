@@ -415,7 +415,7 @@ public class MProcess extends Thread
 		}
 
 		/* create and initialise a new MProcess structure */
-		mp = new MProcess (parent);
+		mp = MKernel.NewProcess(parent);
 		mp.user_if = mup;
 		mp.pid = MKernel.get_free_pid ();
 		mp.cmdline = args;
