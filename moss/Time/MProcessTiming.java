@@ -12,20 +12,20 @@ public class MProcessTiming{
 	 */
 	
 	//Max Process Schedule Time (arbitrarily choose the maxProcessScheduleTime).
-	double maxProcessScheduleTime=200;
-	double maxSegmentLength=20;
-	int maxPossibleProcesses=20;
-	int maxPossibleCPURuns=15;
+	static double maxProcessScheduleTime=200;
+	static double maxSegmentLength=20;
+	static int maxPossibleProcesses=20;
+	static int maxPossibleCPURuns=15;
 	
 	//Somewhat arbitrarily choose maxPossibleCPURuns segments that would need to run on CPU
 	//for any given process. Also arbitrarily chose a max of maxPossibleProcesses processes
 	//that would be running at any given time.
-	double[][][] MProcessSchedules= new double[maxPossibleProcesses][maxPossibleCPURuns][2]; 
+	static double[][][] MProcessSchedules= new double[maxPossibleProcesses][maxPossibleCPURuns][2]; 
 	
 	//A string of process names that correspond to the first index of MProcessSchedules
 	//such that each of maxPossibleProcesses possible processes has maxPossibleCPURuns segments of time that it is running
 	//in the CPU.
-	String[] MProcessScheduleMapping=new String[maxPossibleProcesses];
+	static int[] MProcessScheduleMapping=new int[maxPossibleProcesses];
 	
 	/* 
 	 * processTime represents how much a given process has progressed to completion.
@@ -33,17 +33,17 @@ public class MProcessTiming{
 	 * process is running on the CPU such that it is possible that real time is still
 	 * incrementing while the process time is stagnant.
 	 */
-	double[] processTime=new double[20]; 
+	static double[] processTime=new double[20]; 
 	
 	//Initialize a single MProcess (for use when a Process has completed) or when initializing the 
 	//array that makes up the schedules for all the processes.
-	private void initializeMProcessSchedule(int processIndex){
+	static private void initializeMProcessSchedule(int processIndex){
 		
 		processTime[processIndex]=0;
 		
-		MProcessScheduleMapping[processIndex]="?";
+		MProcessScheduleMapping[processIndex]=-1;
 		
-		for(int j=0;j<MProcessSchedules[1].length;j=j+1){
+		for(int j=0;j<MProcessSchedules[0].length;j=j+1){
 			for(int k=0;k<MProcessSchedules[1][1].length;k=k+1){
 				
 				MProcessSchedules[processIndex][j][k]=-1;
@@ -55,7 +55,7 @@ public class MProcessTiming{
 	}
 	
 	//Initialize the schedules for all of the processes.
-	public void initializeMProcessSchedules(){
+	static public void initializeMProcessSchedules(){
 		//Initialize all MProcessScheduleMapping value to "?". Assumption is that
 		//no process name is called "?".
 		for (int i=0;i<MProcessScheduleMapping.length;i=i+1){
@@ -71,7 +71,7 @@ public class MProcessTiming{
 	 * randomProcessScheduleGeneration: For adding a process with some "processName" and a generating a random schedule for it.
 	 */
 	
-	public void randomProcessScheduleGeneration(String processName){
+	static public void randomProcessScheduleGeneration(int processID){
 		
 		int processSlot=0;
 		Random rnd = new Random();
@@ -81,87 +81,155 @@ public class MProcessTiming{
 		double totalProcessTime=rnd.nextDouble()*maxProcessScheduleTime;
 		
 		//Find process slot that is not being used
-		while(MProcessScheduleMapping[processSlot]!="?"){
+		while(MProcessScheduleMapping[processSlot]!=-1){
 			processSlot=processSlot+1;	
 		}
 		
 		//Place the name of the process inside the schedule mapping.
-		MProcessScheduleMapping[processSlot]=processName;
+		MProcessScheduleMapping[processSlot]=processID;
 		
-		for(int i=0;i<MProcessSchedules[1].length;i=i+1){
+		for(int i=0;i<MProcessSchedules[0].length;i=i+1){
 			
 			if(i==0){
-				MProcessSchedules[processSlot][i][1]=rnd.nextDouble()*5;
+				MProcessSchedules[processSlot][i][0]=rnd.nextDouble()*5;
 				//Assume there could be up to a 5s I/O wait in beginning of process
 			}else{ 
-				if(MProcessSchedules[processSlot][i-1][2]!=totalProcessTime){
-					MProcessSchedules[processSlot][i][1]=Math.min(MProcessSchedules[processSlot][i-1][2]+rnd.nextDouble()*maxSegmentLength,totalProcessTime);
+				if(MProcessSchedules[processSlot][i-1][1]!=totalProcessTime){
+					MProcessSchedules[processSlot][i][0]=Math.min(MProcessSchedules[processSlot][i-1][1]+rnd.nextDouble()*maxSegmentLength,totalProcessTime);
 				}else{
-					MProcessSchedules[processSlot][i][1]=-1; //leave section at end or actual schedule with -1s to indicate schedule end.
+					MProcessSchedules[processSlot][i][0]=-1; //leave section at end or actual schedule with -1s to indicate schedule end.
 				}
 			}
 			
-			if(MProcessSchedules[processSlot][i][1]!=-1){
-				MProcessSchedules[processSlot][i][2]=Math.min(MProcessSchedules[processSlot][i-1][2]+rnd.nextDouble()*maxSegmentLength,totalProcessTime);
+			if(MProcessSchedules[processSlot][i][0]!=-1){
+				MProcessSchedules[processSlot][i][1]=Math.min(MProcessSchedules[processSlot][i-1][1]+rnd.nextDouble()*maxSegmentLength,totalProcessTime);
 			}else{
-				MProcessSchedules[processSlot][i][2]=-1;
+				MProcessSchedules[processSlot][i][1]=-1;
 			}
 		}
 		
 	}
 	
-	private int findScheduleNum(String processName){
-		int currProcess=0;
-			while(MProcessScheduleMapping[currProcess]!=processName){
-				currProcess=currProcess+1;
+/*
+ * addCPUTimeSlotOnProcess: Writes a new CPU time slot to the process's schedule.
+ * returns an error if the desired time slot does not fall after the rest of the schedule.
+ * (so a constraint when using the method is that schedule time slots need to be added 
+ * sequentially). 
+ */	
+static public void addCPUTimeSlotOnProcess(int processID,int startTime,int endTime){
+		
+		int processSlot=0;
+		Random rnd = new Random();
+		
+		//If the process ID hasn't been added to the schedule mapping...
+		if(findScheduleNum(processID)==-1){
+			//Find process slot that is not being used
+			while(MProcessScheduleMapping[processSlot]!=-1){
+				processSlot=processSlot+1;	
 			}
-		if(MProcessScheduleMapping[currProcess]==processName)
 			
-			return currProcess;//If process is found return its index
-		else
-			return -1;//Otherwise return a -1 to indicate that the process' schedule was not found.
+			//Then place the name of the process inside the schedule mapping.
+			MProcessScheduleMapping[processSlot]=processID;
+		}else{
+			
+			processSlot=findScheduleNum(processID);
+		}
+		
+		
+		boolean processScheduleEndFound=false;
+		
+		//Iterate through all of the possible time slots
+		for(int i=0;i<MProcessSchedules[1].length;i=i+1){
+			
+			//Once the end of the process is found...
+			if((MProcessSchedules[processSlot][i][0]==-1)&&!processScheduleEndFound){
+				processScheduleEndFound=true;
+				
+				//...check to make sure  that the startTime for the schedule segment
+				//being added is greater than the current startTime.
+				//If that's the case, then add the schedule segment.
+				
+				if(i==0){
+					MProcessSchedules[processSlot][i][0]=startTime;
+					MProcessSchedules[processSlot][i][1]=endTime;
+					return;
+				}
+				
+				if(startTime>MProcessSchedules[processSlot][i-1][1]){
+					MProcessSchedules[processSlot][i][0]=startTime;
+					MProcessSchedules[processSlot][i][1]=endTime;
+					return;
+				}
+				
+			}
+		}
+		
+	}
+
+	static public double findProcessTime(int processID){
+		int scheduleNum=findScheduleNum(processID);
+		if (scheduleNum!=-1){
+			return processTime[scheduleNum];
+		}
+		return -1;//return -1 if process doesn't exist..
 	}
 	
-	private void deleteProcess(String processName){
-		
-		initializeMProcessSchedule(findScheduleNum(processName));
-		
+	static private int findScheduleNum(int processID){
+		int currProcess=0;
+		boolean foundProcessInMap=false;
+			while(!foundProcessInMap && currProcess<maxPossibleProcesses){
+				
+				if(MProcessScheduleMapping[currProcess]==processID)
+					return currProcess; //If process is found return its index
+				foundProcessInMap=MProcessScheduleMapping[currProcess]==processID;
+				currProcess=currProcess+1;
+			}
+
+			return -1;//Otherwise return a -1 to indicate that the process' schedule was not found.
 	}
 	
 	//advanceProcess is called in order to advance some process that has
 	//been chosen to run on the CPU.
-	public double advanceProcess(String processName){
+	static public double advanceProcess(int processID,double advanceTimeAmount){
 		double globalTimeAdvance=0;
-		int processNum=findScheduleNum(processName);
+		int processNum=findScheduleNum(processID);
 		int searchNextProcessTimeIndex=0;
-		
-		while (processTime[processNum]>MProcessSchedules[processNum][searchNextProcessTimeIndex][2]){
+		boolean processTimeLargerThanCurrentScheduleIndex=processTime[processNum]>=MProcessSchedules[processNum][searchNextProcessTimeIndex][1];
+		while (processTimeLargerThanCurrentScheduleIndex&&searchNextProcessTimeIndex<maxPossibleCPURuns){
 			searchNextProcessTimeIndex=searchNextProcessTimeIndex+1;
+			processTimeLargerThanCurrentScheduleIndex=(processTime[processNum]>=MProcessSchedules[processNum][searchNextProcessTimeIndex][1])
+					&&MProcessSchedules[processNum][searchNextProcessTimeIndex][1]!=-1;
 		}
-		globalTimeAdvance=MProcessSchedules[processNum][searchNextProcessTimeIndex][2]-processTime[processNum];
-		processTime[processNum]=MProcessSchedules[processNum][searchNextProcessTimeIndex][2];
+		globalTimeAdvance=Math.min(MProcessSchedules[processNum][searchNextProcessTimeIndex][1]-processTime[processNum],advanceTimeAmount);
+		processTime[processNum]=processTime[processNum]+globalTimeAdvance;
 
 		advanceAllProcessesDoingIO(globalTimeAdvance,processNum);
 		
-		if(MProcessSchedules[processNum][searchNextProcessTimeIndex+1][1]==-1){
+		if(MProcessSchedules[processNum][searchNextProcessTimeIndex][0]==-1){
 			//Process has finished executing entirely, initialize its spot so that it doesn't run again
 			//and new process can take spot.
 			
 			initializeMProcessSchedule(processNum);
+			return -1;//return -1 when process ends.
 			
 		}
 		
 		return globalTimeAdvance;
 	}
 	
-	private void advanceAllProcessesDoingIO(double TimeToAdvanceBy,int processNotToAdvance){
+	
+	//Advances all of the processes doing I/O by some amount of time (typically while some other process is running on CPU)
+	static private void advanceAllProcessesDoingIO(double TimeToAdvanceBy,int processNotToAdvance){
 		int searchNextProcessTimeIndex=0;
 		
 		for(int i=0;i<MProcessSchedules.length;i=i+1){
-			if(i!=processNotToAdvance){//Don't advance process because it is running on CPU during this time and can't do I/O.
+			//Don't advance process because it is running on CPU during this time and can't do I/O.
+			//Also don't advance processes who's first row contains -1. That indicates that this is
+			//a blank spot.
+			if(i!=processNotToAdvance&&MProcessSchedules[i][0][1]!=-1){
 				
 			searchNextProcessTimeIndex=0;
-			while (processTime[i]>=MProcessSchedules[i][searchNextProcessTimeIndex][2]){
+			while (processTime[i]>=MProcessSchedules[i][searchNextProcessTimeIndex][1]){
 				searchNextProcessTimeIndex=searchNextProcessTimeIndex+1;
 			}
 			processTime[i]=Math.min(MProcessSchedules[i][searchNextProcessTimeIndex][1], processTime[i]+TimeToAdvanceBy);
@@ -170,8 +238,8 @@ public class MProcessTiming{
 		}	
 	}
 	
-	public String[] returnAllProcessesThatCanRunOnCPU(){
-		String[] processesReadyToRun=new String[maxPossibleProcesses];
+	static public int[] returnAllProcessesThatCanRunOnCPU(){
+		int[] processesReadyToRun=new int[maxPossibleProcesses];
 		int countProcessesReadytoRun=0;
 		for(int i=0;i<MProcessSchedules.length;i=i+1){
 			for(int j=0;j<MProcessSchedules[1].length;j=j+1){
