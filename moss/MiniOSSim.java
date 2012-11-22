@@ -19,15 +19,24 @@
 
 package moss;
 
+import javax.xml.bind.annotation.XmlElementDecl.GLOBAL;
+
 import moss.kernel.*;
+import moss.memory.*;
 import moss.user.*;
+import moss.exampleProcessAndRun.*;
+import Time.*;
 
 public class MiniOSSim
 {
 	public static void main (String args[])
 	{
 		MProcessor cpus[];
-
+		
+		//memoryFrame memory = new memoryFrame();
+		
+		MProcessTiming.initializeMProcessSchedules();
+		
 		System.out.println ("MOSS (Mini Operating-System Simulator) version " + MConfig.version + " starting...");
 
 		/* initialise CPU objects */
@@ -39,6 +48,8 @@ public class MiniOSSim
 		/* initialise kernel */
 		MKernel.init_kernel (cpus, System.out);
 
+		//BatchProcessCreationExamples.batchProcessCreationExample1();
+		
 		/* create init task */
 		new MInitTask ((String[])(args.clone ()));
 
