@@ -31,5 +31,9 @@ moss/modules/UTimerTest.class /bin/timertest
 moss/modules/UUMount.class /bin/umount
 moss/modules/UUnlink.class /bin/unlink
 moss/modules/UWfln.class /bin/wfln
+moss/modules/UDummy.class /bin/udummy
+moss/modules/UProcessA.class /bin/processA
+moss/modules/UProcessB.class /bin/processB
+moss/modules/UUnitTest1.class /bin/unitTest1
 extra/etc/init /etc/init
 extra/etc/console /etc/console
