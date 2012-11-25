@@ -40,10 +40,6 @@ public class FIFOScheduler extends SchedulerBase{
 	public Boolean IsProcessAvailable() {
 		return m_queue.size() > 0;
 	}
-	
-	//Private Fields
-	Queue<MProcess> m_queue = new LinkedList<MProcess>();
-}
 
 	//Private Fields
 	Queue<MProcess> m_queue = new LinkedList<MProcess>();

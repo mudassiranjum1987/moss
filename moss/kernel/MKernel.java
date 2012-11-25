@@ -54,9 +54,6 @@ public class MKernel
 	
 	private static SchedulerType m_schedularType;
 	
-	/** Scheduler object */
-	public static IScheduler m_schedular; 
-
 	//}}}
 	
 	public static IScheduler getScheduler()
@@ -64,12 +61,6 @@ public class MKernel
 		return m_schedular;
 	}
 	
-
-	public static IScheduler getScheduler()
-	{
-		return m_schedular;
-	}
-
 
 	//{{{  private static class PFS_mkernel implements MProcFSIf
 	/**
@@ -134,7 +125,6 @@ public class MKernel
 		
 		m_schedular = NewScheduler();
 		
-		m_schedular = new FIFOScheduler();
 		current = new MProcess[MConfig.ncpus];
 		lock = new CREWLock ();
 		nextpid = 0;
@@ -205,54 +195,6 @@ public class MKernel
 	public static void schedule ()
 	{
 		getScheduler().Schedule();
-		/* we enter this with the "current" Thread */
-		MProcess old_p, new_p;
-		int cpu = MProcessor.currentCPU ();
-
-		lock.claim_write ();
-
-		if (current[cpu] == null) {
-			panic ("MKernel::schedule().  current[cpu] is null!");
-		}
-		if (!getScheduler().IsProcessAvailable()) {
-			/* nothing else to run, make processor idle */
-			old_p = current[cpu];
-			new_p = null;
-			processors[cpu].set_process (null);
-		} else {
-			/* pick a process off the run-queue */
-			old_p = current[cpu];
-			new_p = getScheduler().GetNextProcess();
-
-			processors[cpu].set_process (new_p);
-		}
-		current[cpu] = null;
-
-		lock.release_write ();
-
-		if (new_p != old_p) {
-			/* wake new (if not idling), sleep old */
-			synchronized (old_p) {
-				if (new_p != null) {
-					synchronized (new_p) {
-						new_p.notify ();
-					}
-				}
-				try {
-					old_p.wait ();
-				} catch (InterruptedException e) {
-					panic ("MKernel::schedule().  interrupted: " + e.getMessage());
-				}
-			}
-		}
-
-		/* when a thread wakes up here, it is old_p */
-		cpu = MProcessor.currentCPU ();
-		lock.claim_write ();
-		current[cpu] = old_p;
-		/* ensure it is properly detached from any queue */
-		old_p.state = MProcess.TASK_RUNNING;
-		lock.release_write ();
 	}
 	//}}}
 	//{{{  private static void schedule_to_cpu (MProcess p, int cpu)
@@ -381,7 +323,7 @@ public class MKernel
 		/* tell parent process -- done before we check the run-queue. */
 		if (current[cpu].parent != null) {
 			MSignal chldsig = new MSignal (MSignal.SIGCHLD, (Object)(new int[] {current[cpu].pid, exitcode}));
-
+			
 			queue_signal (current[cpu].parent, chldsig);
 		}
 
@@ -397,7 +339,6 @@ public class MKernel
 			old_p = current[cpu];
 			new_p = getScheduler().GetNextProcess();
 			
-
 			processors[cpu].set_process (new_p);
 		}
 		current[cpu] = null;			/* just incase anything tries during the reschedule */
@@ -570,7 +511,7 @@ public class MKernel
 			}
 		}
 		lock.release_read ();
-
+		
 		return tmp;
 	}
 	//}}}
@@ -821,4 +762,3 @@ public class MKernel
 	}
 }
 
-}
