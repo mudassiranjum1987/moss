@@ -1,4 +1,4 @@
-package Time;
+package moss.Time;
 
 import java.util.Random;
 

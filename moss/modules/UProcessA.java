@@ -1,7 +1,7 @@
 package moss.modules;
 
 import moss.user.*;
-import Time.*;
+import moss.Time.*;
 
 public class UProcessA implements MUserProcess{
 

@@ -24,8 +24,7 @@ import javax.xml.bind.annotation.XmlElementDecl.GLOBAL;
 import moss.kernel.*;
 import moss.memory.*;
 import moss.user.*;
-import moss.exampleProcessAndRun.*;
-import Time.*;
+import moss.Time.*;
 
 public class MiniOSSim
 {

@@ -1,7 +1,5 @@
-package Time;
+package moss.Time;
 
 public class Time {
-	
-	double systemTime=0;
 
 }
