@@ -19,18 +19,23 @@ public class UProcessA implements MUserProcess{
 				MProcessTiming.addCPUTimeSlotOnProcess(MPosixIf.getpid(),13,20);
 				MProcessTiming.addCPUTimeSlotOnProcess(MPosixIf.getpid(),22,40);
 			}
-			MPosixIf.writestring (MPosixIf.STDOUT, "ProcessA is at process time:"+MProcessTiming.findProcessTime(MPosixIf.getpid())+"\n");
+
+			MPosixIf.writestring (MPosixIf.STDOUT, "ProcessA starts at process time:"+MProcessTiming.findProcessTime(MPosixIf.getpid())+"\n");
 			
 			globalTimeAdvanceFromLastProcessRun=MProcessTiming.advanceProcess(MPosixIf.getpid(), quantum);
+			
+			MPosixIf.writestring (MPosixIf.STDOUT, "ProcessA ends at process time:"+MProcessTiming.findProcessTime(MPosixIf.getpid())+"\n");
+			MPosixIf.writestring(MPosixIf.STDOUT, "Global time is:"+MProcessTiming.getGlobalTime()+"\n");
+			
 			MPosixIf.reschedule();
 		}
-		MPosixIf.exit (0);
+		//MPosixIf.exit (0);
 		return 0;
 	}
 
 	public void signal (int signo, Object sigdata)
 	{
-		MPosixIf.writestring (MPosixIf.STDOUT, "UHelloWorld signalled with " + signo + "!\n");
+		return;
 	}
 	
 }

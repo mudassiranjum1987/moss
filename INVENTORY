@@ -34,6 +34,15 @@ moss/modules/UWfln.class /bin/wfln
 moss/modules/UDummy.class /bin/udummy
 moss/modules/UProcessA.class /bin/processA
 moss/modules/UProcessB.class /bin/processB
+moss/modules/UProcessC.class /bin/processC
+moss/modules/UProcessD.class /bin/processD
+moss/modules/UProcessE.class /bin/processE
+moss/modules/UProcessF.class /bin/processF
+moss/modules/UProcessG.class /bin/processG
 moss/modules/UUnitTest1.class /bin/unitTest1
+moss/modules/UUnitTest2.class /bin/unitTest2
+moss/modules/UUnitTest3.class /bin/unitTest3
+moss/modules/UUnitTest4.class /bin/unitTest4
+moss/modules/UUnitTest5.class /bin/unitTest5
 extra/etc/init /etc/init
 extra/etc/console /etc/console

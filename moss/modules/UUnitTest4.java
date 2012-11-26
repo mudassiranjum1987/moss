@@ -11,13 +11,15 @@ import moss.user.*;
  * lower-priority ones even print out their first line.
  */
 
-public class UUnitTest1 implements MUserProcess{
+public class UUnitTest4 implements MUserProcess{
 	public int main (String argv[], MEnv envp){
 	int processFailIndicator=0;//Initialize
-	int numberOfProcessesInUnitTest=2;
+	int numberOfProcessesInUnitTest=4;
 	
-	processFailIndicator= MPosixIf.forkexecc ("/bin/processA", argv);
-	processFailIndicator= MPosixIf.forkexecc ("/bin/processB", argv);
+	processFailIndicator= MPosixIf.forkexecc ("/bin/processE", argv);
+	processFailIndicator= MPosixIf.forkexecc ("/bin/processC", argv);
+	processFailIndicator= MPosixIf.forkexecc ("/bin/processD", argv);
+	processFailIndicator= MPosixIf.forkexecc ("/bin/processC", argv);
 	
 	
 	if (processFailIndicator < 0) {
@@ -54,5 +56,3 @@ public class UUnitTest1 implements MUserProcess{
 	}
 
 }
-
-

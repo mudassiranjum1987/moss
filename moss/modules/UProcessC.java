@@ -3,7 +3,7 @@ package moss.modules;
 import moss.user.*;
 import moss.Time.*;
 
-public class UProcessB implements MUserProcess{
+public class UProcessC implements MUserProcess{
 
 	public int main (String argv[], MEnv envp)
 	{
@@ -11,20 +11,20 @@ public class UProcessB implements MUserProcess{
 		double globalTimeAdvanceFromLastProcessRun=0;
 
 		while(globalTimeAdvanceFromLastProcessRun!=-1){
-			MPosixIf.writestring (MPosixIf.STDOUT, "ProcessB Running On CPU\n");
-			MPosixIf.writestring (MPosixIf.STDOUT, "ProcessB has PID:"+MPosixIf.getpid()+"\n");
+			MPosixIf.writestring (MPosixIf.STDOUT, "ProcessC Running On CPU\n");
+			MPosixIf.writestring (MPosixIf.STDOUT, "ProcessC has PID:"+MPosixIf.getpid()+"\n");
 		
 			if(MProcessTiming.findProcessTime(MPosixIf.getpid())==-1){
-				MProcessTiming.addCPUTimeSlotOnProcess(MPosixIf.getpid(),0,30);
-				MProcessTiming.addCPUTimeSlotOnProcess(MPosixIf.getpid(),32,40);
-				MProcessTiming.addCPUTimeSlotOnProcess(MPosixIf.getpid(),60,80);
+				MProcessTiming.addCPUTimeSlotOnProcess(MPosixIf.getpid(),0,23);
+				MProcessTiming.addCPUTimeSlotOnProcess(MPosixIf.getpid(),55,90);
+				MProcessTiming.addCPUTimeSlotOnProcess(MPosixIf.getpid(),100,110);
 			}
 			
-			MPosixIf.writestring (MPosixIf.STDOUT, "ProcessB starts at process time:"+MProcessTiming.findProcessTime(MPosixIf.getpid())+"\n");
+			MPosixIf.writestring (MPosixIf.STDOUT, "ProcessC starts at process time:"+MProcessTiming.findProcessTime(MPosixIf.getpid())+"\n");
 			
 			globalTimeAdvanceFromLastProcessRun=MProcessTiming.advanceProcess(MPosixIf.getpid(), quantum);
 			
-			MPosixIf.writestring (MPosixIf.STDOUT, "ProcessB ends at process time:"+MProcessTiming.findProcessTime(MPosixIf.getpid())+"\n");
+			MPosixIf.writestring (MPosixIf.STDOUT, "ProcessC ends at process time:"+MProcessTiming.findProcessTime(MPosixIf.getpid())+"\n");
 			MPosixIf.writestring(MPosixIf.STDOUT, "Global time is:"+MProcessTiming.getGlobalTime()+"\n");
 			
 			
@@ -40,4 +40,3 @@ public class UProcessB implements MUserProcess{
 	}
 	
 }
-
