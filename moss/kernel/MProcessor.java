@@ -116,6 +116,19 @@ public class MProcessor
 		MKernel.panic ("MProcessor::currentCPU() current thread not running on any processor");
 		return -1;
 	}
+	public static int currentCPU (Thread t)
+	{
+		for (int i=0; i<MKernel.processors.length; i++) {
+			if (MKernel.processors[i].pmagic != 0xdeadbeef) {
+				MKernel.panic ("MProcessor::currentCPU() corrupt processor");
+			}
+			if (MKernel.processors[i].current_p == t) {
+				return i;
+			}
+		}
+		MKernel.panic ("MProcessor::currentCPU() current thread not running on any processor");
+		return -1;
+	}
 	//}}}
 	//{{{  public synchronized void set_process (MProcess current)
 	/**
