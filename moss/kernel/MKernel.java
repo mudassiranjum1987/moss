@@ -23,6 +23,8 @@ package moss.kernel;
 import moss.fs.*;
 import moss.drivers.*;
 import moss.ipc.*;
+import moss.kernel.Scheduler.MPrioritizedLotteryProcess;
+import moss.kernel.Scheduler.PrioritizedLotteryScheduler;
 import moss.user.*;
 
 import java.lang.*;
@@ -743,6 +745,8 @@ public class MKernel
 			return new MProcess(parentProcess);
 		case Lottery:
 			return new MLotteryProcess(parentProcess);
+		case PrioritizedLottery:
+			return new MPrioritizedLotteryProcess(parentProcess);
 		}
 		
 		return null;
@@ -756,6 +760,8 @@ public class MKernel
 			return new FIFOScheduler();
 		case Lottery:
 			return new LotteryScheduler();
+		case PrioritizedLottery:
+			return new PrioritizedLotteryScheduler();
 		}
 		
 		return null;
