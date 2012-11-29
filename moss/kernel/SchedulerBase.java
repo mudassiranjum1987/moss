@@ -3,13 +3,13 @@ package moss.kernel;
 public abstract class SchedulerBase implements IScheduler {
 
 	//Constructor
-	
+
 	public SchedulerBase() {
 		// TODO Auto-generated constructor stub
 	}
 
 	//Public Methods
-	
+
 	@Override
 	public Boolean AddProcess(MProcess process) {
 		// TODO Auto-generated method stub
@@ -27,7 +27,7 @@ public abstract class SchedulerBase implements IScheduler {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
+
 	@Override
 	public Boolean IsProcessAvailable() {
 		// TODO Auto-generated method stub
@@ -83,7 +83,6 @@ public abstract class SchedulerBase implements IScheduler {
 		/* ensure it is properly detached from any queue */
 		old_p.state = MProcess.TASK_RUNNING;
 		MKernel.lock.release_write ();
-		
 		return true;
 	}
 }
