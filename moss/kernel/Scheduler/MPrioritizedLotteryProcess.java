@@ -29,17 +29,16 @@ public class MPrioritizedLotteryProcess extends MProcess implements IPrioritized
 	}
 	
 	@Override
-	public void SetPriority(ProcessPriorityEnum priority) {
-		m_processPriority = priority;
+	public void SetPriority(ProcessPriorityEnum processPriority) {
+		priority = processPriority;
 		
 	}
 	@Override
 	public ProcessPriorityEnum GetPriority() {
-		return m_processPriority;
+		return priority;
 	}
 
 	//Private Fields
 	private List<Integer> m_tickets;
-	private ProcessPriorityEnum m_processPriority;
 	
 }
