@@ -4,7 +4,7 @@ import java.util.List;
 
 import moss.kernel.MProcess;
 
-public class MPrioritizedLotteryProcess extends MProcess implements IPrioritizedLotteryProcess{
+public class MPrioritizedLotteryProcess extends MProcess implements IPrioritizedLotteryProcess, IPriorityProcess {
 	//Constructor
 	public MPrioritizedLotteryProcess()
 	{

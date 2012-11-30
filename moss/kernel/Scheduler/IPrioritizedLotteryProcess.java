@@ -12,8 +12,4 @@ public interface IPrioritizedLotteryProcess {
 	 * Get ticket number of current process	
 	 */
 	List<Integer> GetTickets();
-	
-	void SetPriority(ProcessPriorityEnum priority);
-	
-	ProcessPriorityEnum GetPriority();
 }

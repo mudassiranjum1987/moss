@@ -19,7 +19,7 @@ public class PrioritizedLotteryScheduler extends SchedulerBase{
 			public Boolean AddProcess(MProcess process) {
 				if (process != null){
 					IPrioritizedLotteryProcess lotteryProcess = (IPrioritizedLotteryProcess)process;
-					List<Integer> tickets = GetTickets(lotteryProcess);
+					List<Integer> tickets = GetTickets((IPriorityProcess)lotteryProcess);
 					
 					lotteryProcess.SetTickets(tickets);
 					m_listTicketsInUse.addAll(tickets);
@@ -70,7 +70,7 @@ public class PrioritizedLotteryScheduler extends SchedulerBase{
 			}
 			
 			//Private Methods
-			private List<Integer> GetTickets(IPrioritizedLotteryProcess process) {
+			private List<Integer> GetTickets(IPriorityProcess process) {
 				List<Integer> retValue = new ArrayList<Integer>();
 				ProcessPriorityEnum priority = process.GetPriority();
 				int ticketsToAssign = 0;
