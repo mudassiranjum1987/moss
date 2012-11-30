@@ -44,5 +44,7 @@ moss/modules/UUnitTest2.class /bin/unitTest2
 moss/modules/UUnitTest3.class /bin/unitTest3
 moss/modules/UUnitTest4.class /bin/unitTest4
 moss/modules/UUnitTest5.class /bin/unitTest5
+moss/modules/UUnitTest7.class /bin/unitTest7
+moss/modules/UUnitTest8.class /bin/unitTest8
 extra/etc/init /etc/init
 extra/etc/console /etc/console

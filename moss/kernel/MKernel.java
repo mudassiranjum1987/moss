@@ -23,8 +23,11 @@ package moss.kernel;
 import moss.fs.*;
 import moss.drivers.*;
 import moss.ipc.*;
+import moss.kernel.Scheduler.IPriorityProcess;
+import moss.kernel.Scheduler.IPriorityScheduler;
 import moss.kernel.Scheduler.MPrioritizedLotteryProcess;
 import moss.kernel.Scheduler.PrioritizedLotteryScheduler;
+import moss.kernel.Scheduler.ProcessPriorityEnum;
 import moss.user.*;
 
 import java.lang.*;
@@ -122,7 +125,7 @@ public class MKernel
 	 */
 	public static void init_kernel (MProcessor cpus[], PrintStream msgs)
 	{
-		//Set this value to make the specific schedular active <manj>
+		//Set this value to make the specific scheduler active <manj>
 		m_schedularType = SchedulerType.FIFO;
 		
 		m_schedular = NewScheduler();
@@ -685,6 +688,42 @@ public class MKernel
 		}
 		lock.release_read ();
 		return procdata;
+	}
+	
+	public static Boolean setProcessPriority(int pid, ProcessPriorityEnum priority) {
+		Boolean retValue = false;
+		
+		lock.claim_read();
+		
+		//Check if process is currently running
+		for (int i=0; i<current.length; i++) {
+			MProcess iterateProcess = current[i];
+			if (iterateProcess == null)
+				continue;
+			
+			if (iterateProcess.pid == pid) {
+				if (iterateProcess instanceof IPriorityProcess) {
+					((IPriorityProcess)iterateProcess).SetPriority(priority);
+				}
+				else {
+					//Pid found, however the process doen't support Priority mechanism.
+					retValue = false;
+					break;
+				}
+			}
+		}
+		
+		//Check within scheduler list.
+		if (getScheduler() instanceof IPriorityScheduler){
+			retValue = ((IPriorityScheduler)getScheduler()).setProcessPriority(pid, priority);
+		}
+		else {
+			retValue = false;
+		}
+		
+		lock.release_read();
+		
+		return retValue;
 	}
 	//}}}
 	//{{{  public static void process_fault (MProcess p, RuntimeException e)

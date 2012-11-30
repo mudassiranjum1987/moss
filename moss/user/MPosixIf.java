@@ -21,6 +21,7 @@ package moss.user;
 
 import moss.fs.*;
 import moss.kernel.*;
+import moss.kernel.Scheduler.ProcessPriorityEnum;
 import moss.drivers.*;
 import moss.ipc.*;
 import moss.net.*;
@@ -1392,6 +1393,10 @@ public class MPosixIf
 		return -MSystem.ENOSYS;
 	}
 	//}}}
+	
+	public static Boolean setPriority(int pid, ProcessPriorityEnum priority) {
+		return MKernel.setProcessPriority(pid, priority);
+	}
 }
 
 
