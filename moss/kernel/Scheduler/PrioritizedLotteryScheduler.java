@@ -1,17 +1,23 @@
 package moss.kernel.Scheduler;
 
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Random;
 
 import moss.kernel.MProcess;
 import moss.kernel.SchedulerBase;
 
-public class PrioritizedLotteryScheduler extends SchedulerBase implements IPriorityScheduler{
+public class PrioritizedLotteryScheduler extends SchedulerBase implements IPriorityScheduler, IPrioritizedLotteryScheduler{
 	//Constructor
 	public PrioritizedLotteryScheduler() {
 		m_listLotteryProcess = new ArrayList<IPrioritizedLotteryProcess>();
 		m_listTicketsInUse = new ArrayList<Integer>();
+		
+		//Default Tickets initialization
+		getProcessPriorityToTicketMap().put(ProcessPriorityEnum.High, 3);
+		getProcessPriorityToTicketMap().put(ProcessPriorityEnum.Medium, 2);
+		getProcessPriorityToTicketMap().put(ProcessPriorityEnum.Low, 1);
 	}
 	
 	//Private Methods
@@ -82,6 +88,14 @@ public class PrioritizedLotteryScheduler extends SchedulerBase implements IPrior
 		return false;
 	}
 	
+	@Override
+	public void SetTicketsToAssign(ProcessPriorityEnum processPriority, int ticketCount) {
+		if (getProcessPriorityToTicketMap().containsKey(processPriority))
+			getProcessPriorityToTicketMap().remove(processPriority);
+		
+		getProcessPriorityToTicketMap().put(processPriority, ticketCount);
+	}
+	
 	//Private Methods
 	private List<Integer> GetTickets(IPriorityProcess process) {
 		List<Integer> retValue = new ArrayList<Integer>();
@@ -90,13 +104,13 @@ public class PrioritizedLotteryScheduler extends SchedulerBase implements IPrior
 		
 		switch(priority) {
 		case Low:
-			ticketsToAssign = 1;
+			ticketsToAssign = getProcessPriorityToTicketMap().get(ProcessPriorityEnum.Low);
 			break;
 		case Medium: 
-			ticketsToAssign = 2;
+			ticketsToAssign = getProcessPriorityToTicketMap().get(ProcessPriorityEnum.Medium);
 			break;
 		case High:
-			ticketsToAssign = 3;
+			ticketsToAssign = getProcessPriorityToTicketMap().get(ProcessPriorityEnum.High);
 			break;
 		}
 		
@@ -118,7 +132,12 @@ public class PrioritizedLotteryScheduler extends SchedulerBase implements IPrior
 		return ticket;
 	}
 	
+	private Hashtable<ProcessPriorityEnum, Integer> getProcessPriorityToTicketMap() {
+		return m_ProcessPriorityToTicketMap;
+	}
+	
 	//Private Fields
+	private Hashtable<ProcessPriorityEnum, Integer> m_ProcessPriorityToTicketMap = new Hashtable<ProcessPriorityEnum, Integer>();
 	private List<IPrioritizedLotteryProcess> m_listLotteryProcess;
 	private List<Integer> m_listTicketsInUse;
 	private final int TICKETS = Integer.MAX_VALUE;
