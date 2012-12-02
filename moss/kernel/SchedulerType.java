@@ -5,4 +5,5 @@ public enum SchedulerType {
 	Lottery,
 	PreemtiveScheduler,
 	PrioritizedLottery,
+	PrioritizedRoundRobbin,
 }

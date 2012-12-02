@@ -26,8 +26,10 @@ import moss.ipc.*;
 import moss.kernel.Scheduler.IPriorityProcess;
 import moss.kernel.Scheduler.IPriorityScheduler;
 import moss.kernel.Scheduler.MPrioritizedLotteryProcess;
+import moss.kernel.Scheduler.MPrioritizedProcess;
 import moss.kernel.Scheduler.PrioritizedLotteryScheduler;
 import moss.kernel.Scheduler.ProcessPriorityEnum;
+import moss.kernel.Scheduler.RoundRobinPriorityScheduler;
 import moss.user.*;
 
 import java.lang.*;
@@ -786,6 +788,8 @@ public class MKernel
 			return new MLotteryProcess(parentProcess);
 		case PrioritizedLottery:
 			return new MPrioritizedLotteryProcess(parentProcess);
+		case PrioritizedRoundRobbin:
+			return new MPrioritizedProcess(parentProcess);
 		}
 		
 		return null;
@@ -801,6 +805,8 @@ public class MKernel
 			return new LotteryScheduler();
 		case PrioritizedLottery:
 			return new PrioritizedLotteryScheduler();
+		case PrioritizedRoundRobbin:
+			return new RoundRobinPriorityScheduler();
 		}
 		
 		return null;
