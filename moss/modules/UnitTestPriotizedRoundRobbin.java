@@ -20,10 +20,23 @@ public class UnitTestPriotizedRoundRobbin implements MUserProcess{
 	int pidB = MPosixIf.forkexecc ("/bin/processB", argv);
 	int pidC = MPosixIf.forkexecc ("/bin/processC", argv);
 	
-	ProcessPriorityEnum ProcessAPriority = ProcessPriorityEnum.High;
+	
+	/*
+	 * Round robbin process can have the priority values from 1-100. 100 means high priorty and 1 is the lowest priority process.
+	 * The values assigned by ProcessPriorityEnum doesn't matter (below we are assignin Medium). Only the PriorityValue will be consider
+	 * in round robbin (This might be a bit stricky, I could implement it in much better way but I didn't want to change exsisting code 
+	 * MPosixIf.setpriority etc). If you don't set the PriorityValue, following value will be assigned as per ProcessPriorityEnumType
+	 * High = 100
+	 * Medium = 50
+	 * Low = 20
+	 * 
+	 * Each time a process is scheduled. Its priority will be decreased by 1 and in this way the high priorty process will not 
+	 * starve the low priority processes.
+	 */
+	ProcessPriorityEnum ProcessAPriority = ProcessPriorityEnum.Medium;
 	ProcessAPriority.setPriorityValue(40);
 	
-	ProcessPriorityEnum ProcessBPriority = ProcessPriorityEnum.Low;
+	ProcessPriorityEnum ProcessBPriority = ProcessPriorityEnum.Medium;
 	ProcessBPriority.setPriorityValue(39);
 	
 	ProcessPriorityEnum ProcessCPriority = ProcessPriorityEnum.Medium;
